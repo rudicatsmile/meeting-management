@@ -57,6 +57,8 @@ interface MeetingContextType {
   deleteAttachment: (meetingId: string, attachmentId: string) => void;
   toggleUserRole: (userId: string) => void;
   toggleUserActive: (userId: string) => void;
+  addUser: (user: Omit<User, "id" | "initials" | "isActive">) => User;
+  deleteUser: (userId: string) => { success: boolean; message?: string; hasMeetingHistory?: boolean };
   resetToDefaultData: () => void;
 }
 
@@ -448,6 +450,53 @@ export function MeetingProvider({ children }: { children: React.ReactNode }) {
     );
   };
 
+  const addUser = (userData: Omit<User, "id" | "initials" | "isActive">) => {
+    const initials =
+      userData.nama
+        .split(" ")
+        .slice(0, 2)
+        .map((w) => w[0])
+        .join("")
+        .toUpperCase() || "US";
+
+    const newUser: User = {
+      ...userData,
+      id: `user-${Date.now()}`,
+      initials,
+      isActive: true,
+    };
+
+    setUsers((prev) => [...prev, newUser]);
+    return newUser;
+  };
+
+  const deleteUser = (userId: string) => {
+    if (userId === "user-1" || userId === currentUser.id) {
+      return {
+        success: false,
+        message: "Akun ini sedang aktif atau merupakan Admin Utama yayasan.",
+      };
+    }
+
+    const hasHistory = meetings.some(
+      (m) =>
+        m.createdById === userId ||
+        m.attendees.some((a) => a.userId === userId)
+    );
+
+    if (hasHistory) {
+      return {
+        success: false,
+        hasMeetingHistory: true,
+        message:
+          "Pengguna ini memiliki riwayat keikutsertaan dalam rapat yayasan. Untuk menjaga integritas arsip notulen dan risalah, akun tidak dapat dihapus. Silakan gunakan tombol 'Nonaktifkan Akun' sebagai gantinya.",
+      };
+    }
+
+    setUsers((prev) => prev.filter((u) => u.id !== userId));
+    return { success: true };
+  };
+
   const resetToDefaultData = () => {
     setMeetings(INITIAL_MEETINGS);
     setUsers(MOCK_USERS);
@@ -477,6 +526,8 @@ export function MeetingProvider({ children }: { children: React.ReactNode }) {
         deleteAttachment,
         toggleUserRole,
         toggleUserActive,
+        addUser,
+        deleteUser,
         resetToDefaultData,
       }}
     >
