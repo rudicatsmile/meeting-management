@@ -27,6 +27,13 @@ export const metadata: Metadata = {
     "Sistem Rapat Yayasan",
   ],
   authors: [{ name: "Yayasan Al Wathoniyah Asshodriyah 9" }],
+  icons: {
+    icon: [
+      { url: "/logo-yayasan.png", type: "image/png" },
+    ],
+    shortcut: "/logo-yayasan.png",
+    apple: "/logo-yayasan.png",
+  },
   openGraph: {
     title: "RapatKita — Sistem Informasi Rapat & Nota Dinas Yayasan",
     description:
