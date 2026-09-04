@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { PublicLayout } from "@/components/layout/public-layout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -44,8 +45,15 @@ export default function MasukPage() {
       <div className="container max-w-md mx-auto py-12 px-4">
         <Card className="border shadow-lg">
           <CardHeader className="text-center space-y-1 pb-4">
-            <div className="mx-auto h-12 w-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center font-bold mb-2">
-              <Lock className="h-6 w-6" />
+            <div className="mx-auto h-16 w-16 rounded-2xl bg-white p-2 flex items-center justify-center shadow-md border border-border/60 mb-2">
+              <Image
+                src="/logo-yayasan.png"
+                alt="Logo Yayasan Al Wathoniyah Asshodriyah 9"
+                width={56}
+                height={56}
+                className="h-full w-full object-contain"
+                priority
+              />
             </div>
             <CardTitle className="text-2xl font-bold font-heading">
               Masuk ke RapatKita

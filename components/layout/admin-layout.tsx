@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useMeeting } from "@/lib/meeting-context";
 import { PersonaSwitcher } from "./persona-switcher";
@@ -18,7 +19,6 @@ import {
   ShieldCheck,
   AlertTriangle,
   ArrowLeft,
-  CalendarCheck,
 } from "lucide-react";
 
 export function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -100,8 +100,15 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
           >
             {isMobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </Button>
-          <Link href="/kelola" className="font-heading font-extrabold text-primary text-base">
-            RapatKita Admin
+          <Link href="/kelola" className="flex items-center gap-2 font-heading font-extrabold text-primary text-base">
+            <Image
+              src="/logo-yayasan.png"
+              alt="Logo"
+              width={24}
+              height={24}
+              className="h-6 w-6 object-contain"
+            />
+            <span>RapatKita Admin</span>
           </Link>
         </div>
         <PersonaSwitcher />
@@ -116,8 +123,15 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
         {/* Sidebar Header */}
         <div className="p-6 border-b flex items-center justify-between">
           <Link href="/kelola" className="flex items-center gap-2.5">
-            <div className="h-9 w-9 rounded-xl bg-primary flex items-center justify-center text-primary-foreground font-bold shadow-sm">
-              <CalendarCheck className="h-5 w-5" />
+            <div className="h-9 w-9 rounded-xl bg-white p-1 flex items-center justify-center shadow-sm border border-border/60 shrink-0">
+              <Image
+                src="/logo-yayasan.png"
+                alt="Logo Yayasan Al Wathoniyah Asshodriyah 9"
+                width={32}
+                height={32}
+                className="h-full w-full object-contain"
+                priority
+              />
             </div>
             <div>
               <span className="font-heading font-bold text-base tracking-tight text-primary block leading-none">

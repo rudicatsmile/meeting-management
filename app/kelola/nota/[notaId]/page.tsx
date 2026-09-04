@@ -2,6 +2,7 @@
 
 import React, { useState, use } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { AdminLayout } from "@/components/layout/admin-layout";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -172,9 +173,16 @@ export default function EditNotaDinasPage({
         <div className="print-paper bg-card border rounded-2xl p-6 sm:p-12 shadow-md space-y-6 text-foreground font-sans">
           {/* 1. KOP SURAT RESMI YAYASAN */}
           <div className="text-center space-y-1 pb-4 relative">
-            <div className="flex items-center justify-center gap-3">
-              <div className="h-14 w-14 rounded-2xl bg-primary/10 text-primary flex items-center justify-center font-bold text-xl border border-primary/20 shrink-0">
-                <Building2 className="h-8 w-8 text-primary" />
+            <div className="flex items-center justify-center gap-4">
+              <div className="h-16 w-16 rounded-2xl bg-white p-1.5 flex items-center justify-center shadow-xs border border-border/60 shrink-0">
+                <Image
+                  src="/logo-yayasan.png"
+                  alt="Logo Yayasan Al Wathoniyah Asshodriyah 9"
+                  width={60}
+                  height={60}
+                  className="h-full w-full object-contain"
+                  priority
+                />
               </div>
               <div className="text-center">
                 <h2 className="text-lg sm:text-2xl font-black uppercase font-heading tracking-wide text-foreground">

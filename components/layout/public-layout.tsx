@@ -2,9 +2,10 @@
 
 import React from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { PersonaSwitcher } from "./persona-switcher";
 import { Button } from "@/components/ui/button";
-import { CalendarCheck, ShieldCheck, LayoutDashboard, ArrowRight } from "lucide-react";
+import { ShieldCheck, LayoutDashboard, ArrowRight } from "lucide-react";
 import { useMeeting } from "@/lib/meeting-context";
 
 export function PublicLayout({ children }: { children: React.ReactNode }) {
@@ -22,8 +23,15 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
       <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container flex h-16 items-center justify-between">
           <Link href="/" className="flex items-center gap-3 group">
-            <div className="h-10 w-10 rounded-xl bg-primary flex items-center justify-center text-primary-foreground shadow-sm group-hover:scale-105 transition-transform">
-              <CalendarCheck className="h-5 w-5" />
+            <div className="h-10 w-10 rounded-xl bg-white p-1 flex items-center justify-center shadow-sm border border-border/60 group-hover:scale-105 transition-transform shrink-0">
+              <Image
+                src="/logo-yayasan.png"
+                alt="Logo Yayasan Al Wathoniyah Asshodriyah 9"
+                width={36}
+                height={36}
+                className="h-full w-full object-contain"
+                priority
+              />
             </div>
             <div>
               <span className="font-heading font-extrabold text-lg tracking-tight text-primary flex items-center gap-1.5">
@@ -88,8 +96,14 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
       <footer className="border-t bg-muted/40 py-8 mt-16 no-print">
         <div className="container flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-muted-foreground">
           <div className="flex items-center gap-3">
-            <div className="h-7 w-7 rounded-lg bg-primary/10 text-primary flex items-center justify-center font-bold">
-              9
+            <div className="h-8 w-8 rounded-lg bg-white p-1 flex items-center justify-center shadow-xs border border-border/60 shrink-0">
+              <Image
+                src="/logo-yayasan.png"
+                alt="Logo Yayasan Al Wathoniyah Asshodriyah 9"
+                width={28}
+                height={28}
+                className="h-full w-full object-contain"
+              />
             </div>
             <div>
               <p className="font-semibold text-foreground">Yayasan Al Wathoniyah Asshodriyah 9</p>
