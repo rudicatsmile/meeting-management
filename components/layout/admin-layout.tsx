@@ -1,9 +1,9 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useMeeting } from "@/lib/meeting-context";
 import { PersonaSwitcher } from "./persona-switcher";
 import { Button } from "@/components/ui/button";
@@ -19,12 +19,20 @@ import {
   ShieldCheck,
   AlertTriangle,
   ArrowLeft,
+  LogOut,
 } from "lucide-react";
 
 export function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const { currentUser } = useMeeting();
+  const router = useRouter();
+  const { currentUser, logout, isLoaded } = useMeeting();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  useEffect(() => {
+    if (isLoaded && !currentUser) {
+      router.push("/masuk");
+    }
+  }, [isLoaded, currentUser, router]);
 
   const navItems = [
     {
@@ -52,6 +60,17 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
       exact: true,
     },
   ];
+
+  if (!currentUser) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="text-center space-y-3">
+          <div className="h-8 w-8 rounded-full border-2 border-primary border-t-transparent animate-spin mx-auto"></div>
+          <p className="text-xs text-muted-foreground">Mengarahkan ke halaman masuk...</p>
+        </div>
+      </div>
+    );
+  }
 
   // If non-admin is trying to access /kelola in mock demo
   if (currentUser.globalRole !== "ADMIN") {
@@ -214,16 +233,30 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
         </div>
 
         {/* Admin Footer info */}
-        <div className="p-4 border-t text-xs text-muted-foreground space-y-1">
-          <div className="flex items-center justify-between">
-            <span className="text-[11px]">Admin Login:</span>
-            <Badge variant="default" className="text-[10px] px-1.5 py-0 h-4 uppercase">
-              Admin
-            </Badge>
+        <div className="p-4 border-t text-xs text-muted-foreground space-y-3">
+          <div>
+            <div className="flex items-center justify-between">
+              <span className="text-[11px]">Admin Login:</span>
+              <Badge variant="default" className="text-[10px] px-1.5 py-0 h-4 uppercase">
+                Admin
+              </Badge>
+            </div>
+            <p className="font-semibold text-foreground text-xs truncate mt-0.5">
+              {currentUser.nama}
+            </p>
           </div>
-          <p className="font-semibold text-foreground text-xs truncate">
-            {currentUser.nama}
-          </p>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              logout();
+              router.push("/masuk");
+            }}
+            className="w-full text-xs text-destructive hover:text-destructive hover:bg-destructive/10 border-destructive/20 gap-2 h-8"
+          >
+            <LogOut className="h-3.5 w-3.5" />
+            <span>Keluar (Logout)</span>
+          </Button>
         </div>
       </aside>
 

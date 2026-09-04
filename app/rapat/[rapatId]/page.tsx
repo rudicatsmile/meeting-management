@@ -42,6 +42,10 @@ export default function DetailRapatPesertaPage({
   const [isUploading, setIsUploading] = useState(false);
   const [uploadSuccess, setUploadSuccess] = useState(false);
 
+  if (!currentUser) {
+    return null;
+  }
+
   if (!meeting) {
     return (
       <AppLayout>

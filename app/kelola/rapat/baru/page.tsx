@@ -45,9 +45,9 @@ export default function TambahRapatBaruPage() {
   const [linkRapat, setLinkRapat] = useState("");
 
   // Attendees state (default includes current user as PIMPINAN_RAPAT)
-  const [selectedAttendees, setSelectedAttendees] = useState<SelectedAttendeeState[]>([
-    { userId: currentUser.id, peran: "PIMPINAN_RAPAT" },
-  ]);
+  const [selectedAttendees, setSelectedAttendees] = useState<SelectedAttendeeState[]>(() =>
+    currentUser ? [{ userId: currentUser.id, peran: "PIMPINAN_RAPAT" }] : []
+  );
 
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -73,20 +73,20 @@ export default function TambahRapatBaruPage() {
       setErrorMessage("Judul rapat wajib diisi.");
       return;
     }
-    if (!deskripsi.trim()) {
-      setErrorMessage("Agenda dan pembahasan rapat wajib diisi.");
-      return;
-    }
     if (!tanggal) {
-      setErrorMessage("Tanggal pelaksanaan rapat wajib dipilih.");
+      setErrorMessage("Tanggal pelaksanaan rapat wajib ditentukan.");
       return;
     }
-    if (jamSelesai <= jamMulai) {
-      setErrorMessage("Jam selesai rapat harus lebih lambat dari jam mulai.");
+    if (!jamMulai || !jamSelesai) {
+      setErrorMessage("Waktu mulai dan selesai wajib ditentukan.");
+      return;
+    }
+    if (jamMulai >= jamSelesai) {
+      setErrorMessage("Waktu selesai harus lebih lambat dari waktu mulai.");
       return;
     }
     if (selectedAttendees.length === 0) {
-      setErrorMessage("Minimal harus ada 1 peserta yang diundang ke dalam rapat.");
+      setErrorMessage("Minimal harus ada 1 peserta yang diundang dalam rapat.");
       return;
     }
 
@@ -104,7 +104,7 @@ export default function TambahRapatBaruPage() {
         tempat: tempat.trim() || undefined,
         linkRapat: linkRapat.trim() || undefined,
         status: isPublish ? "OPEN" : "DRAFT",
-        createdById: currentUser.id,
+        createdById: currentUser?.id || "user-1",
         attendees: selectedAttendees.map((att, idx) => ({
           id: `att-${Date.now()}-${idx}`,
           meetingId: "",
@@ -124,6 +124,8 @@ export default function TambahRapatBaruPage() {
 
     router.push(`/kelola/rapat/${created.id}`);
   };
+
+  if (!currentUser) return null;
 
   return (
     <AdminLayout>

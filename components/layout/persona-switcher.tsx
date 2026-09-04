@@ -1,6 +1,8 @@
 "use client";
 
 import React, { useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useMeeting } from "@/lib/meeting-context";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -13,11 +15,25 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { UserCheck, RefreshCw, ChevronDown, Shield, User as UserIcon } from "lucide-react";
+import { UserCheck, RefreshCw, ChevronDown, Shield, User as UserIcon, LogOut } from "lucide-react";
 
 export function PersonaSwitcher() {
-  const { currentUser, setCurrentUser, users, resetToDefaultData } = useMeeting();
+  const { currentUser, setCurrentUser, users, resetToDefaultData, logout } = useMeeting();
   const [isOpen, setIsOpen] = useState(false);
+  const router = useRouter();
+
+  if (!currentUser) {
+    return (
+      <div className="no-print flex items-center gap-2">
+        <Link href="/masuk">
+          <Button size="sm" variant="outline" className="text-xs h-8 gap-1.5 border-primary/30 text-primary hover:bg-primary/10">
+            <UserIcon className="h-3.5 w-3.5" />
+            <span>Masuk Akun</span>
+          </Button>
+        </Link>
+      </div>
+    );
+  }
 
   return (
     <div className="no-print">
@@ -56,7 +72,7 @@ export function PersonaSwitcher() {
           <DropdownMenuLabel className="px-2 py-1.5 text-xs text-muted-foreground flex items-center justify-between">
             <span>Simulasi Akun Pengguna</span>
             <Badge variant="outline" className="text-[10px]">
-              Tahap 1 Demo
+              Ganti Cepat
             </Badge>
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
@@ -118,10 +134,21 @@ export function PersonaSwitcher() {
                 resetToDefaultData();
               }
             }}
-            className="text-xs text-destructive hover:text-destructive hover:bg-destructive/10 cursor-pointer flex items-center gap-2 px-2 py-1.5 rounded-lg"
+            className="text-xs text-muted-foreground hover:text-foreground cursor-pointer flex items-center gap-2 px-2 py-1.5 rounded-lg"
           >
             <RefreshCw className="h-3.5 w-3.5" />
             <span>Reset Data Simulasi Awal</span>
+          </DropdownMenuItem>
+
+          <DropdownMenuItem
+            onClick={() => {
+              logout();
+              router.push("/masuk");
+            }}
+            className="text-xs text-destructive hover:text-destructive hover:bg-destructive/10 cursor-pointer flex items-center gap-2 px-2 py-1.5 rounded-lg font-medium"
+          >
+            <LogOut className="h-3.5 w-3.5" />
+            <span>Keluar (Logout)</span>
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

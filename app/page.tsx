@@ -56,7 +56,7 @@ export default function HomePage() {
               </Button>
             </Link>
 
-            {currentUser.globalRole === "ADMIN" ? (
+            {currentUser?.globalRole === "ADMIN" ? (
               <Link href="/kelola" className="w-full sm:w-auto">
                 <Button variant="outline" size="lg" className="w-full sm:w-auto gap-2 text-base h-12 px-6">
                   <ShieldCheck className="h-5 w-5 text-primary" />
@@ -66,7 +66,7 @@ export default function HomePage() {
             ) : (
               <Link href="/masuk" className="w-full sm:w-auto">
                 <Button variant="outline" size="lg" className="w-full sm:w-auto gap-2 text-base h-12 px-6">
-                  <span>Masuk Akun</span>
+                  <span>{currentUser ? "Ganti Akun" : "Masuk Akun"}</span>
                 </Button>
               </Link>
             )}

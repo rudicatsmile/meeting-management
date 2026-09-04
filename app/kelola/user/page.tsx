@@ -146,7 +146,7 @@ export default function KelolaPenggunaPage() {
       return;
     }
 
-    if (userToDelete.id === currentUser.id) {
+    if (currentUser && userToDelete.id === currentUser.id) {
       alert("Anda tidak dapat menghapus akun Anda sendiri yang sedang aktif digunakan.");
       return;
     }
@@ -187,6 +187,8 @@ export default function KelolaPenggunaPage() {
     }
     alert(`Pengguna "${userToDelete.nama}" telah berhasil dihapus secara permanen.`);
   };
+
+  if (!currentUser) return null;
 
   return (
     <AdminLayout>

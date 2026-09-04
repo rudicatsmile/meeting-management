@@ -34,6 +34,8 @@ export default function AdminDashboardPage() {
     0
   );
 
+  if (!currentUser) return null;
+
   return (
     <AdminLayout>
       <div className="space-y-8">

@@ -15,8 +15,10 @@ import {
 import { toRoman } from "./utils";
 
 interface MeetingContextType {
-  currentUser: User;
-  setCurrentUser: (user: User) => void;
+  currentUser: User | null;
+  setCurrentUser: (user: User | null) => void;
+  logout: () => void;
+  isLoaded: boolean;
   users: User[];
   meetings: Meeting[];
   getMeetingById: (id: string) => Meeting | undefined;
@@ -70,7 +72,7 @@ const STORAGE_KEY_ACTIVE_USER = "rapatkita_active_user_v1";
 
 export function MeetingProvider({ children }: { children: React.ReactNode }) {
   const [users, setUsers] = useState<User[]>(MOCK_USERS);
-  const [currentUser, setCurrentUser] = useState<User>(MOCK_USERS[0]);
+  const [currentUser, setCurrentUser] = useState<User | null>(MOCK_USERS[0]);
   const [meetings, setMeetings] = useState<Meeting[]>(INITIAL_MEETINGS);
   const [isLoaded, setIsLoaded] = useState(false);
 
@@ -90,8 +92,12 @@ export function MeetingProvider({ children }: { children: React.ReactNode }) {
         setMeetings(parsed);
       }
       if (storedActiveUser) {
-        const parsed = JSON.parse(storedActiveUser);
-        setCurrentUser(parsed);
+        if (storedActiveUser === "null") {
+          setCurrentUser(null);
+        } else {
+          const parsed = JSON.parse(storedActiveUser);
+          setCurrentUser(parsed);
+        }
       }
     } catch (e) {
       console.error("Gagal memuat data dari localStorage:", e);
@@ -106,16 +112,31 @@ export function MeetingProvider({ children }: { children: React.ReactNode }) {
     try {
       localStorage.setItem(STORAGE_KEY_USERS, JSON.stringify(users));
       localStorage.setItem(STORAGE_KEY_MEETINGS, JSON.stringify(meetings));
-      localStorage.setItem(STORAGE_KEY_ACTIVE_USER, JSON.stringify(currentUser));
+      if (currentUser) {
+        localStorage.setItem(STORAGE_KEY_ACTIVE_USER, JSON.stringify(currentUser));
+      } else {
+        localStorage.setItem(STORAGE_KEY_ACTIVE_USER, "null");
+      }
     } catch (e) {
       console.error("Gagal menyimpan ke localStorage:", e);
     }
   }, [users, meetings, currentUser, isLoaded]);
 
-  const handleSetCurrentUser = (user: User) => {
+  const handleSetCurrentUser = (user: User | null) => {
     setCurrentUser(user);
     if (typeof window !== "undefined") {
-      localStorage.setItem(STORAGE_KEY_ACTIVE_USER, JSON.stringify(user));
+      if (user) {
+        localStorage.setItem(STORAGE_KEY_ACTIVE_USER, JSON.stringify(user));
+      } else {
+        localStorage.setItem(STORAGE_KEY_ACTIVE_USER, "null");
+      }
+    }
+  };
+
+  const logout = () => {
+    setCurrentUser(null);
+    if (typeof window !== "undefined") {
+      localStorage.setItem(STORAGE_KEY_ACTIVE_USER, "null");
     }
   };
 
@@ -133,12 +154,14 @@ export function MeetingProvider({ children }: { children: React.ReactNode }) {
     const newId = `meet-${Date.now()}`;
     const now = new Date().toISOString();
     const status: MeetingStatus = isPublishNow ? "OPEN" : "DRAFT";
+    const creatorId = currentUser?.id || "user-1";
+    const creatorName = currentUser?.nama || "Admin Pengelola Yayasan";
 
     const newMeeting: Meeting = {
       ...data,
       id: newId,
       status,
-      createdById: currentUser.id,
+      createdById: creatorId,
       createdAt: now,
       updatedAt: now,
       attachments: [],
@@ -146,8 +169,8 @@ export function MeetingProvider({ children }: { children: React.ReactNode }) {
         {
           id: `log-${Date.now()}-1`,
           meetingId: newId,
-          actorId: currentUser.id,
-          actorName: currentUser.nama,
+          actorId: creatorId,
+          actorName: creatorName,
           aksi: "PEMBUATAN_DRAF",
           statusLama: "DRAFT",
           statusBaru: "DRAFT",
@@ -159,8 +182,8 @@ export function MeetingProvider({ children }: { children: React.ReactNode }) {
               {
                 id: `log-${Date.now()}-2`,
                 meetingId: newId,
-                actorId: currentUser.id,
-                actorName: currentUser.nama,
+                actorId: creatorId,
+                actorName: creatorName,
                 aksi: "PUBLIKASI",
                 statusLama: "DRAFT",
                 statusBaru: "OPEN",
@@ -209,8 +232,8 @@ export function MeetingProvider({ children }: { children: React.ReactNode }) {
         const newLog = {
           id: `log-${Date.now()}`,
           meetingId,
-          actorId: currentUser.id,
-          actorName: currentUser.nama,
+          actorId: currentUser?.id || "system",
+          actorName: currentUser?.nama || "Pengguna Sistem",
           aksi: aksiName,
           statusLama,
           statusBaru,
@@ -237,6 +260,7 @@ export function MeetingProvider({ children }: { children: React.ReactNode }) {
     setMeetings((prev) =>
       prev.map((m) => {
         if (m.id !== meetingId) return m;
+
         const updatedAttendees = m.attendees.map((att) => {
           const rec = records.find((r) => r.attendeeId === att.id);
           if (rec) {
@@ -309,6 +333,8 @@ export function MeetingProvider({ children }: { children: React.ReactNode }) {
 `.trim();
 
     const noteId = `note-${Date.now()}`;
+    const authorId = currentUser?.id || "user-1";
+    const authorName = currentUser?.nama || "Admin Pengelola Yayasan";
     const newNote: OfficeNote = {
       id: noteId,
       meetingId,
@@ -316,7 +342,7 @@ export function MeetingProvider({ children }: { children: React.ReactNode }) {
       perihal: meeting.judul,
       isiDraft: initialDraft,
       status: "DRAFT",
-      createdById: currentUser.id,
+      createdById: authorId,
       createdAt: isoNow,
       updatedAt: isoNow,
     };
@@ -335,8 +361,8 @@ export function MeetingProvider({ children }: { children: React.ReactNode }) {
             {
               id: `log-${Date.now()}`,
               meetingId,
-              actorId: currentUser.id,
-              actorName: currentUser.nama,
+              actorId: authorId,
+              actorName: authorName,
               aksi: "PENUTUPAN",
               statusLama: m.status,
               statusBaru: "COMPLETED",
@@ -396,8 +422,8 @@ export function MeetingProvider({ children }: { children: React.ReactNode }) {
     const newAttachment: MeetingAttachment = {
       id: `attc-${Date.now()}`,
       meetingId,
-      uploadedById: currentUser.id,
-      uploadedByName: currentUser.nama,
+      uploadedById: currentUser?.id || "user-guest",
+      uploadedByName: currentUser?.nama || "Peserta Rapat",
       namaFileAsli: file.namaFileAsli,
       urlBerkas: "#",
       mimeType: file.mimeType,
@@ -471,7 +497,7 @@ export function MeetingProvider({ children }: { children: React.ReactNode }) {
   };
 
   const deleteUser = (userId: string) => {
-    if (userId === "user-1" || userId === currentUser.id) {
+    if (userId === "user-1" || (currentUser && userId === currentUser.id)) {
       return {
         success: false,
         message: "Akun ini sedang aktif atau merupakan Admin Utama yayasan.",
@@ -513,6 +539,8 @@ export function MeetingProvider({ children }: { children: React.ReactNode }) {
       value={{
         currentUser,
         setCurrentUser: handleSetCurrentUser,
+        logout,
+        isLoaded,
         users,
         meetings,
         getMeetingById,

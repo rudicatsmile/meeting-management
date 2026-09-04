@@ -1,9 +1,9 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useMeeting } from "@/lib/meeting-context";
 import { PersonaSwitcher } from "./persona-switcher";
 import { Button } from "@/components/ui/button";
@@ -15,19 +15,29 @@ import {
   X,
   ChevronRight,
   Shield,
+  LogOut,
 } from "lucide-react";
 
 export function AppLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const { currentUser, meetings } = useMeeting();
+  const router = useRouter();
+  const { currentUser, meetings, logout, isLoaded } = useMeeting();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
+  useEffect(() => {
+    if (isLoaded && !currentUser) {
+      router.push("/masuk");
+    }
+  }, [isLoaded, currentUser, router]);
+
   // Count meetings inviting this user that are OPEN or ONGOING
-  const userActiveMeetingsCount = meetings.filter((m) => {
-    const isInvited = m.attendees.some((att) => att.userId === currentUser.id);
-    const isOpenOrOngoing = m.status === "OPEN" || m.status === "ONGOING";
-    return isInvited && isOpenOrOngoing;
-  }).length;
+  const userActiveMeetingsCount = currentUser
+    ? meetings.filter((m) => {
+        const isInvited = m.attendees.some((att) => att.userId === currentUser.id);
+        const isOpenOrOngoing = m.status === "OPEN" || m.status === "ONGOING";
+        return isInvited && isOpenOrOngoing;
+      }).length
+    : 0;
 
   const navItems = [
     {
@@ -42,6 +52,17 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
       icon: Home,
     },
   ];
+
+  if (!currentUser) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="text-center space-y-3">
+          <div className="h-8 w-8 rounded-full border-2 border-primary border-t-transparent animate-spin mx-auto"></div>
+          <p className="text-xs text-muted-foreground">Mengarahkan ke halaman masuk...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row bg-muted/20">
@@ -188,16 +209,25 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
         </div>
 
         {/* Sidebar Footer */}
-        <div className="p-4 border-t text-xs text-muted-foreground">
-          <div className="flex items-center justify-between mb-2">
+        <div className="p-4 border-t text-xs text-muted-foreground space-y-3">
+          <div className="flex items-center justify-between">
             <span className="text-[11px]">Sesi Aktif:</span>
-            <span className="font-semibold text-foreground text-[11px]">
+            <span className="font-semibold text-foreground text-[11px] truncate max-w-[120px]">
               {currentUser.email.split("@")[0]}
             </span>
           </div>
-          <p className="text-[10px] leading-relaxed text-muted-foreground">
-            Hanya menampilkan rapat yang mengundang Anda saat berstatus Terbuka atau Berlangsung.
-          </p>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              logout();
+              router.push("/masuk");
+            }}
+            className="w-full text-xs text-destructive hover:text-destructive hover:bg-destructive/10 border-destructive/20 gap-2 h-8"
+          >
+            <LogOut className="h-3.5 w-3.5" />
+            <span>Keluar (Logout)</span>
+          </Button>
         </div>
       </aside>
 

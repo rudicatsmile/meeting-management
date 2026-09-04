@@ -30,6 +30,7 @@ export default function DaftarRapatSayaPage() {
   // Must invite current user (or if admin, show relevant meetings)
   // Must be status OPEN or ONGOING
   const userMeetings = useMemo(() => {
+    if (!currentUser) return [];
     return meetings.filter((meeting) => {
       // Must be OPEN or ONGOING for user view
       if (meeting.status !== "OPEN" && meeting.status !== "ONGOING") {
@@ -71,7 +72,7 @@ export default function DaftarRapatSayaPage() {
 
   const getRoleLabel = (meetingId: string) => {
     const meeting = meetings.find((m) => m.id === meetingId);
-    if (!meeting) return null;
+    if (!meeting || !currentUser) return null;
     const att = meeting.attendees.find((a) => a.userId === currentUser.id);
     if (!att) {
       if (meeting.createdById === currentUser.id) return "Pembuat Rapat (Admin)";
@@ -90,6 +91,8 @@ export default function DaftarRapatSayaPage() {
         return att.peran;
     }
   };
+
+  if (!currentUser) return null;
 
   return (
     <AppLayout>

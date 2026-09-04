@@ -50,10 +50,12 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
             <Link href="/" className="text-foreground hover:text-primary transition-colors">
               Beranda
             </Link>
-            <Link href="/rapat" className="text-muted-foreground hover:text-primary transition-colors flex items-center gap-1.5">
-              Rapat Saya
-            </Link>
-            {currentUser.globalRole === "ADMIN" && (
+            {currentUser && (
+              <Link href="/rapat" className="text-muted-foreground hover:text-primary transition-colors flex items-center gap-1.5">
+                Rapat Saya
+              </Link>
+            )}
+            {currentUser?.globalRole === "ADMIN" && (
               <Link href="/kelola" className="text-muted-foreground hover:text-primary transition-colors flex items-center gap-1.5">
                 Dashboard Admin
               </Link>
@@ -61,30 +63,46 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
           </nav>
 
           <div className="flex items-center gap-3">
-            <PersonaSwitcher />
-
-            <div className="flex items-center gap-2">
-              <Link href="/rapat">
-                <Button variant="outline" size="sm" className="hidden sm:inline-flex">
-                  Rapat Saya
-                </Button>
-              </Link>
-              {currentUser.globalRole === "ADMIN" ? (
-                <Link href="/kelola">
-                  <Button size="sm" className="gap-1.5">
-                    <LayoutDashboard className="h-4 w-4" />
-                    <span>Kelola</span>
+            {currentUser ? (
+              <>
+                <PersonaSwitcher />
+                <div className="flex items-center gap-2">
+                  <Link href="/rapat">
+                    <Button variant="outline" size="sm" className="hidden sm:inline-flex">
+                      Rapat Saya
+                    </Button>
+                  </Link>
+                  {currentUser.globalRole === "ADMIN" ? (
+                    <Link href="/kelola">
+                      <Button size="sm" className="gap-1.5">
+                        <LayoutDashboard className="h-4 w-4" />
+                        <span>Kelola</span>
+                      </Button>
+                    </Link>
+                  ) : (
+                    <Link href="/rapat">
+                      <Button size="sm" className="gap-1.5">
+                        <span>Buka Rapat</span>
+                        <ArrowRight className="h-3.5 w-3.5" />
+                      </Button>
+                    </Link>
+                  )}
+                </div>
+              </>
+            ) : (
+              <div className="flex items-center gap-2">
+                <Link href="/masuk">
+                  <Button variant="outline" size="sm" className="text-xs">
+                    Masuk
                   </Button>
                 </Link>
-              ) : (
-                <Link href="/rapat">
-                  <Button size="sm" className="gap-1.5">
-                    <span>Buka Rapat</span>
-                    <ArrowRight className="h-3.5 w-3.5" />
+                <Link href="/daftar">
+                  <Button size="sm" className="text-xs">
+                    Daftar
                   </Button>
                 </Link>
-              )}
-            </div>
+              </div>
+            )}
           </div>
         </div>
       </header>

@@ -24,6 +24,10 @@ export default function UnduhLampiranPage({
   const { idLampiran } = use(params);
   const { meetings, currentUser } = useMeeting();
 
+  if (!currentUser) {
+    return null;
+  }
+
   // Find attachment across all meetings
   let foundAttachment = null;
   let parentMeeting = null;
